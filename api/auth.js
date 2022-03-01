@@ -37,7 +37,22 @@ var upload = multer({ storage: storage });
 router.post("/authtype", async function (req, res) {
   const { userid, email } = req.body;
   const user = await User.findOne({ userID: userid });
-  if (!(user.hasOwnProperty("name"))) {
+  
+  if(!user){
+    const newUser = new User({
+      userID: userid,
+      email: email,
+    });
+    await newUser.save();
+    const token = jwt.sign({ user_id: newUser.userID }, "myprecious");
+    res.status(200).json({
+      authtype: "signup",
+      user_id: newUser.userID,
+      jwt: token,
+    });
+  }
+  else if ((user.hasOwnProperty("name"))) {
+    
     const token = jwt.sign({ user_id: user.userID }, "myprecious");
     res.status(200).json({
       authtype: "signup",
@@ -55,19 +70,7 @@ router.post("/authtype", async function (req, res) {
     });
   }
  
-  else{
-    const newUser = new User({
-      userID: userid,
-      email: email,
-    });
-    await newUser.save();
-    const token = jwt.sign({ user_id: newUser.userID }, "myprecious");
-    res.status(200).json({
-      authtype: "signup",
-      user_id: newUser.userID,
-      jwt: token,
-    });
-  }
+  
 });
 
 
