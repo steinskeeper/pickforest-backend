@@ -51,7 +51,8 @@ router.post("/authtype", async function (req, res) {
       jwt: token,
     });
   }
-  else if ((user.hasOwnProperty("name"))) {
+  else if ("name" in user===false) {
+    
     
     const token = jwt.sign({ user_id: user.userID }, "myprecious");
     res.status(200).json({
