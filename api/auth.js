@@ -37,64 +37,65 @@ var upload = multer({ storage: storage });
 router.post("/authtype", async function (req, res) {
   const { userid, email } = req.body;
   const user = await User.findOne({ userID: userid });
-  
-  if(!user){
+  if (user === null) {
+    
     const newUser = new User({
       userID: userid,
       email: email,
     });
     await newUser.save();
     const token = jwt.sign({ user_id: newUser.userID }, "myprecious");
-    res.status(200).json({
+    return res.status(200).json({
       authtype: "signup",
       user_id: newUser.userID,
       jwt: token,
     });
   }
-  else if ("name" in user===false) {
-    
+
+  if (user) {
     
     const token = jwt.sign({ user_id: user.userID }, "myprecious");
-    res.status(200).json({
-      authtype: "signup",
-      user_id: user.userID,
-      jwt: token,
-    });
-  
-  }
-  else if (user) {
-    const token = jwt.sign({ user_id: user.userID }, "myprecious");
-    res.status(200).json({
+    const username = user.name;
+    if (username === undefined) {
+      return res.status(200).json({
+        authtype: "signup",
+        user_id: user.userID,
+        jwt: token,
+      });
+    }
+    return res.status(200).json({
       authtype: "signin",
       user_id: user.userID,
       jwt: token,
     });
   }
- 
-  
 });
 
+router.post(
+  "/onboard",
+  grantAccess(),
+  upload.single("pfp"),
+  async function (req, res) {
+    try {
+      const username = req.body.username;
+      const user_id = req.user.user_id;
+      const pfp = req.file;
+      const user = await User.findOneAndUpdate(
+        { userID: user_id },
+        {
+          name: username,
+          pfp: pfp.path,
+        }
+      );
 
-router.post("/onboard",grantAccess(),upload.single('pfp'), async function (req, res) {
-  try{  
-  const username = req.body.username
-    const user_id = req.user.user_id;
-    const pfp = req.file
-    const user = await User.findOneAndUpdate({ userID: user_id }, {
-      name: username,
-      pfp: pfp.path,
-    });
-
-    res.status(200).json({
-      status: "success",
-      details: user
-
-    });
-    
+      res.status(200).json({
+        status: "success",
+        details: user,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
-  catch (err){
-    console.log(err)
-  }
-});
+);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const treeschema = mongoose.Schema({
-  treeID: { type: mongoose.Schema.Types.ObjectId, unique: true, required: true, index: true },
+  treeID: mongoose.Schema.Types.ObjectId,
   url: String,
   title: String,
   emoji: String,
