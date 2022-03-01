@@ -73,8 +73,9 @@ router.post(
     }
   }
 );
-router.get("/get/:id", async (req, res) => {
-    var bucket = await Bucket.findOne({ bucketID: req.params.id });
+router.post("/get", async (req, res) => {
+    const{bucketID,token} = req.body;
+    var bucket = await Bucket.findOne({ bucketID: bucketID });
     
 
     res.status(200).json(bucket);
@@ -151,7 +152,7 @@ router.post("/select-reaction", async function (req, res) {
         
       });
 })
-router.post("/unselect-downvote", async function (req, res) {
+router.post("/unselect-reaction", async function (req, res) {
     const{imageID,bucketID} = req.body
     
     const bucket = await Bucket.findOneAndUpdate({ bucketID: bucketID,'imageCardDetails.imageID':imageID }, {

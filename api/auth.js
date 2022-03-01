@@ -45,6 +45,15 @@ router.post("/authtype", async function (req, res) {
       jwt: token,
     });
   }
+  else if (user.hasOwnProperty("name")) {
+    const token = jwt.sign({ user_id: user.userID }, "myprecious");
+    res.status(200).json({
+      authtype: "signup",
+      user_id: user.userID,
+      jwt: token,
+    });
+  
+  }
   else{
     const newUser = new User({
       userID: userid,
