@@ -118,7 +118,8 @@ router.post("/get", async (req, res) => {
     bucket.isAdmin = false;
   }
 
-  
+  const maxvote = bucket.imageCardDetails.reduce((p,c)=>p.votes.upvotes>c.votes.upvotes ?p:c)
+  bucket.winnerImage =maxvote.imageID
 
   res.status(200).json(bucket);
 });
