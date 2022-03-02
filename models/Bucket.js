@@ -44,6 +44,9 @@ const bucketschema = mongoose.Schema({
   bucketName: String,
   imageCardDetails: [imageschema],
   userID: { type: String, ref: "User", required: true },
+  votingopen: String,
+  expiryAt: Date,
+
 
 },
 {timestamps:true});
