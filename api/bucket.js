@@ -294,4 +294,18 @@ router.post("/unselect-reaction", async function (req, res) {
   }
 });
 
+router.get("/home", async function (req, res) {
+  var bucket = await Bucket.find().lean();
+  var buck = bucket 
+  bucket.map((buc)=>{
+    buc.imageList=[]
+    buc.imageCardDetails.map((img)=>{
+      
+      buc.imageList.push(img.imgURL)
+      buc.votesOnBucket=img.votes.upvotes
+    })
+  })
+  res.status(200).json(bucket);
+})
+
 module.exports = router;
