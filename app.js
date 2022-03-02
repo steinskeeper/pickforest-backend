@@ -9,6 +9,7 @@ var cors = require('cors')
 var authRouter = require('./api/auth')
 var userRouter = require('./api/user')
 var bucketRouter = require('./api/bucket')
+var photosRouter = require('./api/photos')
 
 var app = express();
 var mongoose = require('mongoose');
@@ -27,6 +28,9 @@ app.use(cors())
 app.use('/auth', authRouter)
 app.use('/user', userRouter)
 app.use('/bucket', bucketRouter)
+app.use('/photos', photosRouter)
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
