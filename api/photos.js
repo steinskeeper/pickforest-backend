@@ -1,15 +1,15 @@
 var express = require("express");
 var router = express.Router();
 
-router.post("/getimg",async function (req, res) {
-const{imgURL}=req.body;
+router.get("/getimg/:url",async function (req, res) {
+
 const path = require("path");
-res.sendFile(path.join(__dirname, "../",imgURL));
+res.sendFile(path.join(__dirname, "../",req.params.url));
 })
-router.post("/getpfp",async function (req, res) {
-    const{pfp}=req.body;
+router.get("/getpfp/:url",async function (req, res) {
+    
     const path = require("path");
-    res.sendFile(path.join(__dirname, "../",pfp));
+    res.sendFile(path.join(__dirname, "../",req.params.url));
     })
 
 module.exports = router;
