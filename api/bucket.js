@@ -50,7 +50,7 @@ router.post(
       images.map((pic) => {
         imagecard.push({
           imageID: nanoid(),
-          imgURL: pic.path,
+          imgURL: pic.filename,
         });
       });
 
@@ -98,13 +98,13 @@ router.post(
 );
 router.post("/get", async (req, res) => {
   var { bucketID, token } = req.body;
-  var decoded ={}
 
-  if (token) {
+  var decoded = {};
+
+  try {
     decoded = jwt.verify(token, "myprecious");
-  }
-  else {
-    decoded.user_id="notowner"
+  } catch (err) {
+    decoded.user_id = "notowner";
   }
 
   var bucket = await Bucket.findOne({ bucketID: bucketID }).lean();
@@ -118,8 +118,10 @@ router.post("/get", async (req, res) => {
     bucket.isAdmin = false;
   }
 
-  const maxvote = bucket.imageCardDetails.reduce((p,c)=>p.votes.upvotes>c.votes.upvotes ?p:c)
-  bucket.winnerImage =maxvote.imageID
+  const maxvote = bucket.imageCardDetails.reduce((p, c) =>
+    p.votes.upvotes > c.votes.upvotes ? p : c
+  );
+  bucket.winnerImage = maxvote.imageID;
 
   res.status(200).json(bucket);
 });
