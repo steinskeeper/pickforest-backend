@@ -86,6 +86,7 @@ router.post(
 
       res.status(200).json({
         status: "success",
+        bucketid: bucket.bucketID,
       });
     } catch (err) {
       return res.json({
@@ -97,9 +98,13 @@ router.post(
 );
 router.post("/get", async (req, res) => {
   var { bucketID, token } = req.body;
+  var decoded ={}
 
   if (token) {
     decoded = jwt.verify(token, "myprecious");
+  }
+  else {
+    decoded.user_id="notowner"
   }
 
   var bucket = await Bucket.findOne({ bucketID: bucketID }).lean();
@@ -110,7 +115,10 @@ router.post("/get", async (req, res) => {
   if (bucket.userID === decoded.user_id) {
     bucket.isAdmin = true;
   } else {
+    bucket.isAdmin = false;
   }
+
+  
 
   res.status(200).json(bucket);
 });
