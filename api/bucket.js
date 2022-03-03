@@ -231,109 +231,57 @@ router.post("/usup-sdown", async function (req, res) {
 
 router.post("/select-reaction", async function (req, res) {
   const { imageID, bucketID, reaction } = req.body;
+  let query = {}
 
-  if (reaction === "confetti") {
+  query[`imageCardDetails.$.reactions.${reaction}`] = 1;
+
+
+ 
     const bucket = await Bucket.findOneAndUpdate(
       { bucketID: bucketID, "imageCardDetails.imageID": imageID },
       {
-        $inc: {
-          "imageCardDetails.$.reactions.confetti": 1,
-        },
+        $inc: query
       }
     );
     res.status(200).json({
       status: "success",
     });
-  } else if (reaction === "heart") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.heart": 1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  } else if (reaction === "wow") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.wow": 1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  } else if (reaction === "dislike") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.dislike": 1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  }
+  
 });
 router.post("/unselect-reaction", async function (req, res) {
   const { imageID, bucketID, reaction } = req.body;
+  let query = {}
 
-  if (reaction === "confetti") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.confetti": -1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  } else if (reaction === "heart") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.heart": -1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  } else if (reaction === "wow") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.wow": -1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  } else if (reaction === "dislike") {
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: {
-          "imageCardDetails.$.reactions.dislike": -1,
-        },
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  }
+  query[`imageCardDetails.$.reactions.${reaction}`] = -1;
+
+  const bucket = await Bucket.findOneAndUpdate(
+    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+    {
+      $inc: query
+    }
+  );
+  res.status(200).json({
+    status: "success",
+  });
+});
+
+router.post("/both-reaction", async function (req, res) {
+  const { imageID, bucketID, unreaction,reaction } = req.body;
+  let query = {}
+  
+
+  query[`imageCardDetails.$.reactions.${unreaction}`] = -1;
+  query[`imageCardDetails.$.reactions.${reaction}`] = 1;
+
+  const bucket = await Bucket.findOneAndUpdate(
+    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+    {
+      $inc: query
+    }
+  );
+  res.status(200).json({
+    status: "success",
+  });
 });
 
 router.get("/home",grantAccess(), async function (req, res) {
