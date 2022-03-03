@@ -9,7 +9,7 @@ res.sendFile(path.join(__dirname, "../static/photos/",req.params.url));
 router.get("/getpfp/:url",async function (req, res) {
     
     const path = require("path");
-    res.sendFile(path.join(__dirname, "../",req.params.url));
+    res.sendFile(path.join(__dirname, "../static/pfp/",req.params.url));
     })
 
 module.exports = router;
