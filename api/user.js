@@ -50,7 +50,7 @@ router.post("/update-namepic",grantAccess(),upload.single('pfp'), async function
       const subname = req.body.subname
       const user = await User.findOneAndUpdate({ userID: user_id }, {
         name: username,
-        pfp: pfp.path,
+        pfp: pfp.filename,
         subname: subname,
       });
   
