@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 var Bucket = require("../models/Bucket");
+var User = require("../models/User");
 const grantAccess = require("../utils/verifytoken");
 var multer = require("multer");
 const { nanoid } = require("nanoid");
@@ -107,7 +108,7 @@ router.post("/get", async (req, res) => {
     decoded.user_id = "notowner";
   }
 
-  var bucket = await Bucket.findOne({ bucketID: bucketID }).populate(userID).lean();
+  var bucket = await Bucket.findOne({ bucketID: bucketID }).lean();
   bucket.imageCardDetails.map((img) => {
     img.voted = "notvoted";
     img.reacted = "notreacted";
@@ -122,6 +123,10 @@ router.post("/get", async (req, res) => {
     p.votes.upvotes > c.votes.upvotes ? p : c
   );
   bucket.winnerImage = maxvote.imageID;
+
+  const user = await User.findOne({ userID: bucket.userID }).lean();
+  console.log(user)
+  bucket.name = user.name;
 
   res.status(200).json(bucket);
 });
