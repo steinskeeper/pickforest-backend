@@ -134,6 +134,8 @@ router.post("/get", async (req, res) => {
 router.post("/select-upvote", async function (req, res) {
   const { imageID, bucketID } = req.body;
 
+  
+
   const bucket = await Bucket.findOneAndUpdate(
     { bucketID: bucketID, "imageCardDetails.imageID": imageID },
     {
@@ -191,6 +193,41 @@ router.post("/unselect-downvote", async function (req, res) {
     status: "success",
   });
 });
+
+router.post("/usdown-sup", async function (req, res) {
+  const { imageID, bucketID } = req.body;
+
+  const bucket = await Bucket.findOneAndUpdate(
+    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+    {
+      $inc: {
+        "imageCardDetails.$.votes.downvotes": -1,
+        "imageCardDetails.$.votes.upvotes": 1,
+      },
+    }
+  );
+  res.status(200).json({
+    status: "success",
+  });
+});
+
+router.post("/usup-sdown", async function (req, res) {
+  const { imageID, bucketID } = req.body;
+
+  const bucket = await Bucket.findOneAndUpdate(
+    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+    {
+      $inc: {
+        "imageCardDetails.$.votes.downvotes": 1,
+        "imageCardDetails.$.votes.upvotes": -1,
+      },
+    }
+  );
+  res.status(200).json({
+    status: "success",
+  });
+});
+
 
 router.post("/select-reaction", async function (req, res) {
   const { imageID, bucketID, reaction } = req.body;
