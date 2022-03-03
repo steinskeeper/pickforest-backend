@@ -96,6 +96,7 @@ router.post("/update-tree",grantAccess(), async function (req, res) {
             treeID: treeID,
             url: url,
             title: title,
+            emoji: emoji,
             
         }},
         

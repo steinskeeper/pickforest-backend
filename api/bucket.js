@@ -341,9 +341,10 @@ router.get("/home",grantAccess(), async function (req, res) {
 
   bucket.map((buc) => {
     buc.imageList = [];
+    buc.votesOnBucket = 0;
     buc.imageCardDetails.map((img) => {
       buc.imageList.push(img.imgURL);
-      buc.votesOnBucket = img.votes.upvotes;
+      buc.votesOnBucket = img.votes.upvotes+buc.votesOnBucket;
     });
   });
   res.status(200).json(bucket);
