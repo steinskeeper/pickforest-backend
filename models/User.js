@@ -12,7 +12,7 @@ const userschema = mongoose.Schema({
   
   userID: {type:String,unique:true,required:true,index:true},
   name: String,
-  subname: { type: String, required: true, unique: true },
+  subname: { type: String,unique: true },
   coverURL: String,
   pfp: String,
   email: String,
