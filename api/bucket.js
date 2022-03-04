@@ -127,6 +127,7 @@ router.post("/get", async (req, res) => {
   const user = await User.findOne({ userID: bucket.userID }).lean();
   console.log(user)
   bucket.name = user.name;
+  bucket.adminPFP = user.pfp;
 
   res.status(200).json(bucket);
 });
