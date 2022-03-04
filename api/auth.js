@@ -70,6 +70,7 @@ router.post("/authtype", async function (req, res) {
     return res.status(200).json({
       authtype: "signin",
       user_id: user.userID,
+      details: user,
       jwt: token,
     });
   }
