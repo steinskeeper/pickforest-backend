@@ -14,7 +14,11 @@ var storage = multer.diskStorage({
       cb(null, "./static/pfp");
     } else if (file.mimetype === "image/jpg") {
       cb(null, "./static/pfp");
-    } else {
+    }
+    else if (file.mimetype === "image/gif") {
+      cb(null, "./static/pfp");
+    }
+     else {
       console.log(file.mimetype);
       cb({ error: "Mime type not supported" });
     }
@@ -74,19 +78,22 @@ router.post("/authtype", async function (req, res) {
 router.post(
   "/onboard",
   grantAccess(),
-  upload.single("pfp"),
+  [upload.any()],
   async function (req, res) {
     try {
       const username = req.body.username;
       const user_id = req.user.user_id;
-      const pfp = req.file;
+      const pfp = req.files.find(file => file.fieldname === "pfp").filename;
+      const coverURL = req.files.find(file => file.fieldname === "cover").filename;
       const subname = req.body.subname;
+      
       const user = await User.findOneAndUpdate(
         { userID: user_id },
         {
           name: username,
           pfp: pfp.path,
           subname: subname,
+          coverURL: coverURL
         }
       );
 
