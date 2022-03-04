@@ -80,11 +80,13 @@ router.post(
       const username = req.body.username;
       const user_id = req.user.user_id;
       const pfp = req.file;
+      const subname = req.body.subname;
       const user = await User.findOneAndUpdate(
         { userID: user_id },
         {
           name: username,
           pfp: pfp.path,
+          subname: subname,
         }
       );
 
