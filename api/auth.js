@@ -94,7 +94,8 @@ router.post(
           pfp: pfp,
           subname: subname,
           coverURL: coverURL
-        }
+        },
+        { new: true }
       );
 
       res.status(200).json({
