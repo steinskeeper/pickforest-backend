@@ -13,13 +13,11 @@ var storage = multer.diskStorage({
       cb(null, "./static/pfp");
     } else if (file.mimetype === "image/jpeg") {
       cb(null, "./static/pfp");
-    }
-     else if (file.mimetype === "image/jpg") {
+    } else if (file.mimetype === "image/jpg") {
       cb(null, "./static/pfp");
-    }else if (file.mimetype === "image/gif") {
+    } else if (file.mimetype === "image/gif") {
       cb(null, "./static/pfp");
-    }
-     else {
+    } else {
       console.log(file.mimetype);
       cb({ error: "Mime type not supported" });
     }
@@ -45,30 +43,33 @@ router.get("/get/:id", async (req, res) => {
 });
 
 router.post(
-  "/update-namepic",
+  "/update-deets",
   grantAccess(),
+
   [upload.any()],
   async function (req, res) {
     try {
       const username = req.body.username;
       const user_id = req.user.user_id;
-      const pfp = req.files.find(file => file.fieldname === "pfp").filename;
-      const coverURL = req.files.find(file => file.fieldname === "cover").filename;
-      const subname = req.body.subname;
+
+      const pfp = req.files.find((file) => file.fieldname === "pfp").filename;
+      const coverURL = req.files.find(
+        (file) => file.fieldname === "cover"
+      ).filename;
+
       const user = await User.findOneAndUpdate(
         { userID: user_id },
         {
           name: username,
           pfp: pfp,
           coverURL: coverURL,
-          subname: subname,
         },
         { new: true }
       );
 
       res.status(200).json({
         status: "success",
-        message: "User updated",
+        message: user,
       });
     } catch (err) {
       console.log(err);
@@ -152,14 +153,12 @@ router.post("/avail-username", async function (req, res, next) {
         status: "true",
         message: "Username available",
       });
-    }
-    else{
+    } else {
       res.status(200).json({
         status: "false",
         message: "Username unavailable",
       });
     }
-
   } catch (err) {
     console.log(err);
   }
