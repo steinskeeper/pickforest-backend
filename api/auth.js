@@ -91,7 +91,7 @@ router.post(
         { userID: user_id },
         {
           name: username,
-          pfp: pfp.path,
+          pfp: pfp,
           subname: subname,
           coverURL: coverURL
         }

@@ -12,7 +12,7 @@ function grantAccess() {
             });
         }
 
-        console.log(token);
+        
         try {
             const decoded = jwt.verify(token, "myprecious");
             console.log(decoded);
