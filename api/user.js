@@ -163,4 +163,9 @@ router.post("/avail-username", async function (req, res, next) {
     console.log(err);
   }
 });
+
+router.get("/publicget/:id", async (req, res) => {
+  const user = await User.findOne({ subname: req.params.id });
+  res.status(200).json(user);
+});
 module.exports = router;
