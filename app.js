@@ -25,10 +25,10 @@ app.use(cors())
 
 
 
-app.use('api/auth', authRouter)
-app.use('api/user', userRouter)
-app.use('api/bucket', bucketRouter)
-app.use('api/photos', photosRouter)
+app.use('/api/auth', authRouter)
+app.use('/api/user', userRouter)
+app.use('/api/bucket', bucketRouter)
+app.use('/api/photos', photosRouter)
 
 
 // catch 404 and forward to error handler
