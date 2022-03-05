@@ -108,5 +108,10 @@ router.post(
     }
   }
 );
+router.get("/test",async function (req, res) {
+  res.json({
+    hello: "world",
+  })
+})
 
 module.exports = router;
