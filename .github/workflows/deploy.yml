@@ -2,10 +2,10 @@ name: Backend
 on: [push]
 jobs:
   build:
-    name: Deploy Backend
+    name: Backend Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: Deploying frontend - latest commit
+    - name: Deploying backend - latest commit
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
