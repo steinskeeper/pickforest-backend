@@ -6,6 +6,8 @@ const grantAccess = require("../utils/verifytoken");
 var multer = require("multer");
 const { nanoid } = require("nanoid");
 const mongoose = require("mongoose");
+const sharp = require("sharp");
+sharp.cache(false);
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
