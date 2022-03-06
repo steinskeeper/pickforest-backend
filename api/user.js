@@ -51,6 +51,7 @@ router.post(
     try {
       const username = req.body.username;
       const user_id = req.user.user_id;
+      const subname = req.body.subname;
 
       var pfp = "";
       var coverURL = "";
@@ -71,10 +72,11 @@ router.post(
         name: username,
         pfp: pfp,
         coverURL: coverURL,
+        subname: subname,
       };
 
       Object.keys(data).forEach((k) => data[k] == undefined && delete data[k]);
-
+      console.log(data);
       const user = await User.findOneAndUpdate({ userID: user_id }, data, {
         new: true,
       });
