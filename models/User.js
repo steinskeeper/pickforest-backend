@@ -12,10 +12,10 @@ const userschema = mongoose.Schema({
   
   userID: {type:String,unique:true,required:true,index:true},
   name: String,
-  subname: { type: String,unique: true },
+  subname: { type: String,unique: true,sparse: true },
   coverURL: String,
   pfp: String,
-  email: String,
+  email: { type: String,unique: true },
   trees: [treeschema]
   
 });

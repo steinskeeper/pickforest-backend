@@ -6,6 +6,8 @@ const grantAccess = require("../utils/verifytoken");
 var multer = require("multer");
 const { nanoid } = require("nanoid");
 const mongoose = require("mongoose");
+const sharp = require("sharp");
+sharp.cache(false);
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -49,23 +51,46 @@ router.post(
   [upload.any()],
   async function (req, res) {
     try {
+      req.files.map(async (file) => {
+        if (file.mimetype === "image/jpeg") {
+          let buffer = await sharp(file.path).jpeg({ quality: 50 }).toBuffer();
+          return sharp(buffer).toFile(file.path);
+        } else if (file.mimetype === "image/png") {
+          let buffer = await sharp(file.path).png({ quality: 50 }).toBuffer();
+          return sharp(buffer).toFile(file.path);
+        }
+      });
       const username = req.body.username;
       const user_id = req.user.user_id;
+      const subname = req.body.subname;
 
-      const pfp = req.files.find((file) => file.fieldname === "pfp").filename;
-      const coverURL = req.files.find(
-        (file) => file.fieldname === "cover"
-      ).filename;
+      var pfp = "";
+      var coverURL = "";
+      if (req.files.filter((e) => e.fieldname === "pfp").length > 0) {
+        pfp = req.files.find((file) => file.fieldname === "pfp").filename;
+      } else {
+        pfp = undefined;
+      }
 
-      const user = await User.findOneAndUpdate(
-        { userID: user_id },
-        {
-          name: username,
-          pfp: pfp,
-          coverURL: coverURL,
-        },
-        { new: true }
-      );
+      if (req.files.filter((e) => e.fieldname === "cover").length > 0) {
+        coverURL = req.files.find(
+          (file) => file.fieldname === "cover"
+        ).filename;
+      } else {
+        coverURL = undefined;
+      }
+      var data = {
+        name: username,
+        pfp: pfp,
+        coverURL: coverURL,
+        subname: subname,
+      };
+
+      Object.keys(data).forEach((k) => data[k] == undefined && delete data[k]);
+      console.log(data);
+      const user = await User.findOneAndUpdate({ userID: user_id }, data, {
+        new: true,
+      });
 
       res.status(200).json({
         status: "success",

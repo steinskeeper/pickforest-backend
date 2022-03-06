@@ -13,7 +13,7 @@ var photosRouter = require('./api/photos')
 
 var app = express();
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/picktest').
+mongoose.connect('mongodb://localhost:27017/picktestnew').
   catch(error => handleError(error));
 app.use(express.static('static'))
 
