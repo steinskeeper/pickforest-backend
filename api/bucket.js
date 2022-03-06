@@ -42,6 +42,15 @@ router.post(
   [upload.any()],
   async function (req, res) {
     try {
+      req.files.map(async (file) => {
+        if (file.mimetype === "image/jpeg") {
+          let buffer = await sharp(file.path).jpeg({ quality: 50 }).toBuffer();
+          return sharp(buffer).toFile(file.path);
+        } else if (file.mimetype === "image/png") {
+          let buffer = await sharp(file.path).png({ quality: 50 }).toBuffer();
+          return sharp(buffer).toFile(file.path);
+        }
+      });
       const images = req.files;
       const bucketname = req.body.bucketname;
       const expirytime = req.body.expirytime;
@@ -125,7 +134,7 @@ router.post("/get", async (req, res) => {
   bucket.winnerImage = maxvote.imageID;
 
   const user = await User.findOne({ userID: bucket.userID }).lean();
-  console.log(user)
+  console.log(user);
   bucket.name = user.name;
   bucket.adminPFP = user.pfp;
 
@@ -134,8 +143,6 @@ router.post("/get", async (req, res) => {
 
 router.post("/select-upvote", async function (req, res) {
   const { imageID, bucketID } = req.body;
-
-  
 
   const bucket = await Bucket.findOneAndUpdate(
     { bucketID: bucketID, "imageCardDetails.imageID": imageID },
@@ -229,36 +236,32 @@ router.post("/usup-sdown", async function (req, res) {
   });
 });
 
-
 router.post("/select-reaction", async function (req, res) {
   const { imageID, bucketID, reaction } = req.body;
-  let query = {}
+  let query = {};
 
   query[`imageCardDetails.$.reactions.${reaction}`] = 1;
 
-
- 
-    const bucket = await Bucket.findOneAndUpdate(
-      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-      {
-        $inc: query
-      }
-    );
-    res.status(200).json({
-      status: "success",
-    });
-  
+  const bucket = await Bucket.findOneAndUpdate(
+    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+    {
+      $inc: query,
+    }
+  );
+  res.status(200).json({
+    status: "success",
+  });
 });
 router.post("/unselect-reaction", async function (req, res) {
   const { imageID, bucketID, reaction } = req.body;
-  let query = {}
+  let query = {};
 
   query[`imageCardDetails.$.reactions.${reaction}`] = -1;
 
   const bucket = await Bucket.findOneAndUpdate(
     { bucketID: bucketID, "imageCardDetails.imageID": imageID },
     {
-      $inc: query
+      $inc: query,
     }
   );
   res.status(200).json({
@@ -267,9 +270,8 @@ router.post("/unselect-reaction", async function (req, res) {
 });
 
 router.post("/both-reaction", async function (req, res) {
-  const { imageID, bucketID, unreaction,reaction } = req.body;
-  let query = {}
-  
+  const { imageID, bucketID, unreaction, reaction } = req.body;
+  let query = {};
 
   query[`imageCardDetails.$.reactions.${unreaction}`] = -1;
   query[`imageCardDetails.$.reactions.${reaction}`] = 1;
@@ -277,7 +279,7 @@ router.post("/both-reaction", async function (req, res) {
   const bucket = await Bucket.findOneAndUpdate(
     { bucketID: bucketID, "imageCardDetails.imageID": imageID },
     {
-      $inc: query
+      $inc: query,
     }
   );
   res.status(200).json({
@@ -285,15 +287,15 @@ router.post("/both-reaction", async function (req, res) {
   });
 });
 
-router.get("/home",grantAccess(), async function (req, res) {
-  var bucket = await Bucket.find({userID:req.user.user_id}).lean();
+router.get("/home", grantAccess(), async function (req, res) {
+  var bucket = await Bucket.find({ userID: req.user.user_id }).lean();
 
   bucket.map((buc) => {
     buc.imageList = [];
     buc.votesOnBucket = 0;
     buc.imageCardDetails.map((img) => {
       buc.imageList.push(img.imgURL);
-      buc.votesOnBucket = img.votes.upvotes+buc.votesOnBucket;
+      buc.votesOnBucket = img.votes.upvotes + buc.votesOnBucket;
     });
   });
   res.status(200).json(bucket);

@@ -49,6 +49,15 @@ router.post(
   [upload.any()],
   async function (req, res) {
     try {
+      req.files.map(async (file) => {
+        if (file.mimetype === "image/jpeg") {
+          let buffer = await sharp(file.path).jpeg({ quality: 50 }).toBuffer();
+          return sharp(buffer).toFile(file.path);
+        } else if (file.mimetype === "image/png") {
+          let buffer = await sharp(file.path).png({ quality: 50 }).toBuffer();
+          return sharp(buffer).toFile(file.path);
+        }
+      });
       const username = req.body.username;
       const user_id = req.user.user_id;
       const subname = req.body.subname;
