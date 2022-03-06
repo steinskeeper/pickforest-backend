@@ -1,5 +1,8 @@
 name: Backend
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
     name: Backend Deploy
@@ -12,4 +15,4 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
-        script: ./new-backend.sh
+        script: echo "Hello"
