@@ -52,20 +52,32 @@ router.post(
       const username = req.body.username;
       const user_id = req.user.user_id;
 
-      const pfp = req.files.find((file) => file.fieldname === "pfp").filename;
-      const coverURL = req.files.find(
-        (file) => file.fieldname === "cover"
-      ).filename;
+      var pfp = "";
+      var coverURL = "";
+      if (req.files.filter((e) => e.fieldname === "pfp").length > 0) {
+        pfp = req.files.find((file) => file.fieldname === "pfp").filename;
+      } else {
+        pfp = undefined;
+      }
 
-      const user = await User.findOneAndUpdate(
-        { userID: user_id },
-        {
-          name: username,
-          pfp: pfp,
-          coverURL: coverURL,
-        },
-        { new: true }
-      );
+      if (req.files.filter((e) => e.fieldname === "cover").length > 0) {
+        coverURL = req.files.find(
+          (file) => file.fieldname === "cover"
+        ).filename;
+      } else {
+        coverURL = undefined;
+      }
+      var data = {
+        name: username,
+        pfp: pfp,
+        coverURL: coverURL,
+      };
+
+      Object.keys(data).forEach((k) => data[k] == undefined && delete data[k]);
+
+      const user = await User.findOneAndUpdate({ userID: user_id }, data, {
+        new: true,
+      });
 
       res.status(200).json({
         status: "success",
