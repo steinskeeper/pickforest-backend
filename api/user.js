@@ -39,7 +39,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage });
 
-router.get("/get/:id", async (req, res) => {
+router.get("/get/:id", grantAccess(), async (req, res) => {
   const user = await User.findOne({ userID: req.params.id });
   res.status(200).json(user);
 });
@@ -191,6 +191,9 @@ router.post("/avail-username", async function (req, res, next) {
 
 router.get("/publicget/:id", async (req, res) => {
   const user = await User.findOne({ subname: req.params.id });
+  delete user["_id"];
+  delete user["userID"];
+  delete user["email"];
   res.status(200).json(user);
 });
 module.exports = router;
