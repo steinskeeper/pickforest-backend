@@ -40,8 +40,16 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 router.get("/get/:id", grantAccess(), async (req, res) => {
-  const user = await User.findOne({ userID: req.params.id });
-  res.status(200).json(user);
+  try {
+    const user = await User.findOne({ userID: req.params.id });
+    res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 
 router.post(
@@ -98,76 +106,104 @@ router.post(
       });
     } catch (err) {
       console.log(err);
+      return res.json({
+        message: "error",
+        details: "Failed to Reterive Data",
+      });
     }
   }
 );
 
 router.post("/create-tree", grantAccess(), async function (req, res) {
-  const { url, title, emoji } = req.body;
-  const user_id = req.user.user_id;
-  var treeID = new mongoose.Types.ObjectId();
-  const user = await User.findOneAndUpdate(
-    { userID: user_id },
-    {
-      $push: {
-        trees: {
-          treeID: treeID,
-          url: url,
-          title: title,
-          emoji: emoji,
+  try {
+    const { url, title, emoji } = req.body;
+    const user_id = req.user.user_id;
+    var treeID = new mongoose.Types.ObjectId();
+    const user = await User.findOneAndUpdate(
+      { userID: user_id },
+      {
+        $push: {
+          trees: {
+            treeID: treeID,
+            url: url,
+            title: title,
+            emoji: emoji,
+          },
         },
-      },
-    }
-  );
-  res.status(200).json({
-    status: "success",
-    message: "Tree Added",
-  });
+      }
+    );
+    res.status(200).json({
+      status: "success",
+      message: "Tree Added",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 
 router.post("/update-tree", grantAccess(), async function (req, res) {
-  const { treeID, url, title, emoji } = req.body;
-  const user_id = req.user.user_id;
+  try {
+    const { treeID, url, title, emoji } = req.body;
+    const user_id = req.user.user_id;
 
-  const user = await User.findOneAndUpdate(
-    { userID: user_id, "trees.treeID": treeID },
-    {
-      $set: {
-        "trees.$": {
-          treeID: treeID,
-          url: url,
-          title: title,
-          emoji: emoji,
+    const user = await User.findOneAndUpdate(
+      { userID: user_id, "trees.treeID": treeID },
+      {
+        $set: {
+          "trees.$": {
+            treeID: treeID,
+            url: url,
+            title: title,
+            emoji: emoji,
+          },
         },
       },
-    },
-    { new: true, overwrite: true }
-  );
-  res.status(200).json({
-    status: "success",
-    message: "Tree Updated",
-  });
+      { new: true, overwrite: true }
+    );
+    res.status(200).json({
+      status: "success",
+      message: "Tree Updated",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 
 router.post("/delete-tree", grantAccess(), async function (req, res) {
-  const { treeID } = req.body;
-  const user_id = req.user.user_id;
+  try {
+    const { treeID } = req.body;
+    const user_id = req.user.user_id;
 
-  const user = await User.findOneAndUpdate(
-    { userID: user_id },
-    {
-      $pull: {
-        trees: {
-          treeID: treeID,
+    const user = await User.findOneAndUpdate(
+      { userID: user_id },
+      {
+        $pull: {
+          trees: {
+            treeID: treeID,
+          },
         },
       },
-    },
-    { new: true }
-  );
-  res.status(200).json({
-    status: "success",
-    message: user,
-  });
+      { new: true }
+    );
+    res.status(200).json({
+      status: "success",
+      message: user,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 router.post("/avail-username", async function (req, res, next) {
   try {
@@ -186,14 +222,26 @@ router.post("/avail-username", async function (req, res, next) {
     }
   } catch (err) {
     console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
   }
 });
 
 router.get("/publicget/:id", async (req, res) => {
-  const user = await User.findOne({ subname: req.params.id });
-  delete user["_id"];
-  delete user["userID"];
-  delete user["email"];
-  res.status(200).json(user);
+  try {
+    const user = await User.findOne({ subname: req.params.id }).lean();
+    delete user["_id"];
+    delete user["userID"];
+    delete user["email"];
+    res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 module.exports = router;

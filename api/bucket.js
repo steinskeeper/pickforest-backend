@@ -109,69 +109,93 @@ router.post(
   }
 );
 router.post("/get", async (req, res) => {
-  var { bucketID, token } = req.body;
-
-  var decoded = {};
-
   try {
-    decoded = jwt.verify(token, "myprecious");
+    var { bucketID, token } = req.body;
+
+    var decoded = {};
+
+    try {
+      decoded = jwt.verify(token, "myprecious");
+    } catch (err) {
+      decoded.user_id = "notowner";
+    }
+
+    var bucket = await Bucket.findOne({ bucketID: bucketID }).lean();
+    bucket.imageCardDetails.map((img) => {
+      img.voted = "notvoted";
+      img.reacted = "notreacted";
+    });
+    if (bucket.userID === decoded.user_id) {
+      bucket.isAdmin = true;
+    } else {
+      bucket.isAdmin = false;
+    }
+
+    const maxvote = bucket.imageCardDetails.reduce((p, c) =>
+      p.votes.upvotes > c.votes.upvotes ? p : c
+    );
+    bucket.winnerImage = maxvote.imageID;
+
+    const user = await User.findOne({ userID: bucket.userID }).lean();
+    console.log(user);
+    bucket.name = user.name;
+    bucket.adminPFP = user.pfp;
+
+    res.status(200).json(bucket);
   } catch (err) {
-    decoded.user_id = "notowner";
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
   }
-
-  var bucket = await Bucket.findOne({ bucketID: bucketID }).lean();
-  bucket.imageCardDetails.map((img) => {
-    img.voted = "notvoted";
-    img.reacted = "notreacted";
-  });
-  if (bucket.userID === decoded.user_id) {
-    bucket.isAdmin = true;
-  } else {
-    bucket.isAdmin = false;
-  }
-
-  const maxvote = bucket.imageCardDetails.reduce((p, c) =>
-    p.votes.upvotes > c.votes.upvotes ? p : c
-  );
-  bucket.winnerImage = maxvote.imageID;
-
-  const user = await User.findOne({ userID: bucket.userID }).lean();
-  console.log(user);
-  bucket.name = user.name;
-  bucket.adminPFP = user.pfp;
-
-  res.status(200).json(bucket);
 });
 
 router.post("/select-upvote", async function (req, res) {
-  const { imageID, bucketID } = req.body;
+  try {
+    const { imageID, bucketID } = req.body;
 
-  const bucket = await Bucket.findOneAndUpdate(
-    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-    {
-      $inc: {
-        "imageCardDetails.$.votes.upvotes": 1,
-      },
-    }
-  );
-  res.status(200).json({
-    status: "success",
-  });
+    const bucket = await Bucket.findOneAndUpdate(
+      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+      {
+        $inc: {
+          "imageCardDetails.$.votes.upvotes": 1,
+        },
+      }
+    );
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 router.post("/unselect-upvote", async function (req, res) {
-  const { imageID, bucketID } = req.body;
+  try {
+    const { imageID, bucketID } = req.body;
 
-  const bucket = await Bucket.findOneAndUpdate(
-    { bucketID: bucketID, "imageCardDetails.imageID": imageID },
-    {
-      $inc: {
-        "imageCardDetails.$.votes.upvotes": -1,
-      },
-    }
-  );
-  res.status(200).json({
-    status: "success",
-  });
+    const bucket = await Bucket.findOneAndUpdate(
+      { bucketID: bucketID, "imageCardDetails.imageID": imageID },
+      {
+        $inc: {
+          "imageCardDetails.$.votes.upvotes": -1,
+        },
+      }
+    );
+    res.status(200).json({
+      status: "success",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 router.post("/select-downvote", async function (req, res) {
   const { imageID, bucketID } = req.body;
@@ -290,17 +314,25 @@ router.post("/both-reaction", async function (req, res) {
 });
 
 router.get("/home", grantAccess(), async function (req, res) {
-  var bucket = await Bucket.find({ userID: req.user.user_id }).lean();
+  try {
+    var bucket = await Bucket.find({ userID: req.user.user_id }).lean();
 
-  bucket.map((buc) => {
-    buc.imageList = [];
-    buc.votesOnBucket = 0;
-    buc.imageCardDetails.map((img) => {
-      buc.imageList.push(img.imgURL);
-      buc.votesOnBucket = img.votes.upvotes + buc.votesOnBucket;
+    bucket.map((buc) => {
+      buc.imageList = [];
+      buc.votesOnBucket = 0;
+      buc.imageCardDetails.map((img) => {
+        buc.imageList.push(img.imgURL);
+        buc.votesOnBucket = img.votes.upvotes + buc.votesOnBucket;
+      });
     });
-  });
-  res.status(200).json(bucket);
+    res.status(200).json(bucket);
+  } catch (err) {
+    console.log(err);
+    return res.json({
+      message: "error",
+      details: "Failed to Reterive Data",
+    });
+  }
 });
 
 module.exports = router;
