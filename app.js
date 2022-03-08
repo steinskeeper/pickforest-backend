@@ -15,13 +15,15 @@ var app = express();
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/picktestnew').
   catch(error => handleError(error));
-app.use(express.static('static'))
+
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors())
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5000', 'https://pickforest.me'],
+}))
 
 
 
