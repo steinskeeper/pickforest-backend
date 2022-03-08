@@ -27,7 +27,7 @@ var whitelist = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (whitelist.indexOf(origin) !== -1 || !origin) {
+      if (whitelist.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
         callback(new Error("Dont waste tour time"));
